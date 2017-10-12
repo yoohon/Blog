@@ -23,7 +23,7 @@ import com.yoo.hon.common.FileVO;
 import com.yoo.hon.common.SearchVO;
 
 @Controller
-public class Board4Controller {
+public class Board4Ctr {
    
     @Autowired
     Board4Svc board4Svc;
@@ -100,7 +100,7 @@ public class Board4Controller {
      * 댓글 저장.
      */
     @RequestMapping(value = "/board4ReplySave")
-    public String board5ReplySave(HttpServletRequest request, BoardReplyVO boardReplyInfo) {
+    public String board4ReplySave(HttpServletRequest request, BoardReplyVO boardReplyInfo) {
         
         board4Svc.insertBoardReply(boardReplyInfo);
 

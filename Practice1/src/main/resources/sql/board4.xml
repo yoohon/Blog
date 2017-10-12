@@ -87,7 +87,7 @@
     </delete>
     
     <select id="selectBoard4ReplyList" resultType="com.yoo.hon.board4.BoardReplyVO" parameterType="String">
-        SELECT BRDNO, RENO, REWRITER, REDELETEFLAG, REMEMO, REDATE 
+        SELECT BRDNO, RENO, REWRITER, REDELETEFLAG, REMEMO, REDATE , REORDER, REPARENT, REDEPTH
           FROM TBL_BOARDREPLY
          WHERE BRDNO=#{brdno} AND REDELETEFLAG='N'
          ORDER BY RENO
@@ -98,8 +98,13 @@
             SELECT IFNULL(MAX(RENO),0)+1 FROM TBL_BOARDREPLY
         </selectKey>
             
-        INSERT INTO TBL_BOARDREPLY(BRDNO, RENO, REWRITER, REDELETEFLAG, REMEMO, REDATE)
-        VALUES (#{brdno}, #{reno}, #{rewriter}, 'N', #{rememo}, NOW())
+        INSERT INTO TBL_BOARDREPLY(BRDNO, RENO, REWRITER, REDELETEFLAG, REMEMO, REDATE, REORDER, REPARENT, REDEPTH)
+        VALUES (#{brdno}, #{reno}, #{rewriter}, 'N', #{rememo}, NOW(), #{reorder},
+                   <choose>
+                       <when test="reparent==null">#{reno}, 0</when>
+                       <otherwise>#{reparent}, #{redepth}</otherwise>
+                   </choose>
+               )
     </insert>
 
     <update id="deleteBoard4Reply" parameterType="String"> 
@@ -113,6 +118,22 @@
            SET REMEMO=#{rememo} 
          WHERE RENO=#{reno}
     </update> 
+    
+    <select id="selectBoard4ReplyParent" resultType="com.yoo.hon.board4.BoardReplyVO" parameterType="String">
+        SELECT BRDNO, REDEPTH+1 REDEPTH, REORDER 
+          FROM TBL_BOARDREPLY
+         WHERE RENO=#{reparent}
+    </select>
+    <select id="selectBoard4ReplyMaxOrder" resultType="Integer" parameterType="String">
+        SELECT IFNULL(MAX(REORDER),0)+1
+          FROM TBL_BOARDREPLY
+         WHERE BRDNO=#{brdno}
+    </select>
+   <update id="updateBoard4ReplyOrder" parameterType="com.yoo.hon.board4.BoardReplyVO"> 
+        UPDATE TBL_BOARDREPLY
+           SET REORDER = REORDER + 1 
+         WHERE BRDNO=#{brdno} AND REORDER=#{reorder}       
+    </update>
 
 
 </mapper>

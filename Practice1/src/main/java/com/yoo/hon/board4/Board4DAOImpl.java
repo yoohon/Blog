@@ -91,12 +91,28 @@ public class Board4DAOImpl implements Board4DAO {
     
     @Override
     public void insertBoardReply(BoardReplyVO param) {
-        if (param.getReno()==null || "".equals(param.getReno())) {
+        if (param.getReno() == null || "".equals(param.getReno())) {
+            if (param.getReparent() != null) {
+                BoardReplyVO replyInfo = sqlSession.selectOne("selectBoard4ReplyParent", param.getReparent());
+              
+                param.setRedepth(replyInfo.getRedepth() + 1);
+                param.setReorder(replyInfo.getReorder());
+            
+                
+                sqlSession.selectOne("updateBoard4ReplyOrder", replyInfo);
+            } else {
+                System.out.println("실행3" + param.getBrdno());
+
+                Integer reorder = sqlSession.selectOne("selectBoard4ReplyMaxOrder", param.getBrdno());
+                param.setReorder(reorder);
+            }
+            
             sqlSession.insert("insertBoard4Reply", param);
         } else {
             sqlSession.insert("updateBoard4Reply", param);
         }
     }
+
     
     @Override
     public List<?> selectBoard4ReplyList(String param) {
