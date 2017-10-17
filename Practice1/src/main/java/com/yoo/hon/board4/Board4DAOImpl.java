@@ -91,13 +91,14 @@ public class Board4DAOImpl implements Board4DAO {
     
     @Override
     public void insertBoardReply(BoardReplyVO param) {
+        //댓글 번호가 없는 경우(새댓글) vs 있는 경우(업데이트) 
         if (param.getReno() == null || "".equals(param.getReno())) {
+            //댓글의 부모가 있는 경우(
             if (param.getReparent() != null) {
                 BoardReplyVO replyInfo = sqlSession.selectOne("selectBoard4ReplyParent", param.getReparent());
               
                 param.setRedepth(replyInfo.getRedepth() + 1);
                 param.setReorder(replyInfo.getReorder());
-            
                 
                 sqlSession.selectOne("updateBoard4ReplyOrder", replyInfo);
             } else {
